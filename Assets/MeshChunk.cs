@@ -2,20 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeshChunk : MonoBehaviour{
-    private Mesh mesh;
-    public int ID;
-    private int detailLevel;
-    public bool hasChildren;
-    public MeshChunk[] children;
+public class MeshChunk{
+    public GameObject MeshGO;
+    public MeshChunk ParentChunk;
+    public int DetailLevel;
+    public Vector3 Pos;
+    public bool HasChildren;
+    public MeshChunk[] Children;
+    public int[] PathArray;
 
-    public MeshChunk(Mesh m, int id){
-        mesh = m;
-        ID = id;
-    }
-
-    public void CreateChildren(){
-        hasChildren = true;
-        mesh = null;
+    public MeshChunk(int detailLevel, Vector3 pos){
+        DetailLevel = detailLevel;
+        Pos = pos;
+        HasChildren = false;
+        Children = null;
+        
     }
 }
