@@ -26,6 +26,10 @@ public class MeshGen : MonoBehaviour{
         RootChunk.MeshGO = meshObj;
         
         SplitMesh(RootChunk);
+        SplitMesh(RootChunk.Children[0]);
+        SplitMesh(RootChunk.Children[0].Children[0]);
+        
+        MergeMesh(RootChunk.Children[0]);
 
     }
 
@@ -36,8 +40,7 @@ public class MeshGen : MonoBehaviour{
             chunk.MeshGO.GetComponent<MeshRenderer>().enabled = false;
         
             float offset = RootMeshWidth / MathF.Pow(2, chunk.DetailLevel + 1);
-            print(offset);
-        
+
             Dictionary<int, Vector3> cellOffsets = new Dictionary<int, Vector3>() {
                 {0, Vector3.zero},
                 {1, new Vector3(offset, 0, 0)},
@@ -54,29 +57,43 @@ public class MeshGen : MonoBehaviour{
 
                 Vector3 newPos = chunk.Pos + cellOffsets[i];
                 newObj.transform.position = chunk.Pos + cellOffsets[i];
-
-                print($"{i} {newPos} {offset}");
+                
                 MeshChunk newChunk = new MeshChunk(chunk.DetailLevel + 1, newPos);
             
                 newChunk.MeshGO = newObj;
+                newChunk.ParentChunk = chunk;
                 chunk.Children[i] = newChunk;
             
             }
-
-            if (chunk.DetailLevel < 7) {
-                for (int i = 0; i < 4; i++) {
-                    if (Random.value < 0.6f) {
-                        SplitMesh(chunk.Children[i]);
-                    }
-                }
-            }
+            //testing
+            // if (chunk.DetailLevel < 7) {
+            //     for (int i = 0; i < 4; i++) {
+            //         if (Random.value < 0.6f) {
+            //             SplitMesh(chunk.Children[i]);
+            //         }
+            //     }
+            // }
 
 
         }
         
     }
-    
-    
+    //merges all children meshes into parent mesh
+    private void MergeMesh(MeshChunk chunk){
+        if (chunk.HasChildren) {
+            chunk.HasChildren = false;
+            for (int i = 0; i < 4; i++) {
+                MergeMesh(chunk.Children[i]);
+                Destroy(chunk.Children[i].MeshGO);
+                chunk.Children[i] = null;
+            }
+
+            chunk.Children = null;
+            chunk.MeshGO.GetComponent<MeshRenderer>().enabled = true;
+        }
+    }
+
+
     private Mesh GenMesh(int detailLevel){
         Mesh m = new Mesh();
         
