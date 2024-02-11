@@ -6,33 +6,32 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class MeshGen : MonoBehaviour{
-    [SerializeField] private float CellSize;
+    [SerializeField] private float RootMeshWidth;
     [SerializeField] private int MeshCellCount;
 
-
-    private float RootMeshWidth;
+    private float CellSize;
     private MeshChunk RootChunk;
     
     // Start is called before the first frame update
     void Start(){
         RootChunk = new MeshChunk(0, new Vector3(0,0,0));
-        RootMeshWidth = CellSize * MeshCellCount;
+        CellSize = RootMeshWidth / MeshCellCount;
 
         GameObject meshObj = new GameObject("root");
         meshObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
-        meshObj.AddComponent<MeshFilter>().sharedMesh = GenMesh(0);
+        meshObj.AddComponent<MeshFilter>().sharedMesh = GenMesh(0, Vector2.zero);
         
         meshObj.transform.parent = transform;
         RootChunk.MeshGO = meshObj;
         
         SplitMesh(RootChunk);
-        SplitMesh(RootChunk.Children[0]);
-        SplitMesh(RootChunk.Children[0].Children[0]);
+        // SplitMesh(RootChunk.Children[0]);
+        // SplitMesh(RootChunk.Children[0].Children[0]);
         
-        MergeMesh(RootChunk.Children[0]);
+        //MergeMesh(RootChunk.Children[0]);
 
     }
-
+    //splits chunk into 4 child meshes
     private void SplitMesh(MeshChunk chunk){
         if (!chunk.HasChildren) {
             chunk.HasChildren = true;
@@ -50,12 +49,15 @@ public class MeshGen : MonoBehaviour{
 
             for (int i = 0; i < 4; i++) {
                 GameObject newObj = new GameObject($"mesh {i}");
+                
+                Vector3 newPos = chunk.Pos + cellOffsets[i];
+                
                 newObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
-                newObj.AddComponent<MeshFilter>().sharedMesh = GenMesh(chunk.DetailLevel + 1);
-            
+                newObj.AddComponent<MeshFilter>().sharedMesh = GenMesh(chunk.DetailLevel + 1, new Vector2(newPos.x, newPos.z));
+
                 newObj.transform.parent = chunk.MeshGO.transform;
 
-                Vector3 newPos = chunk.Pos + cellOffsets[i];
+                
                 newObj.transform.position = chunk.Pos + cellOffsets[i];
                 
                 MeshChunk newChunk = new MeshChunk(chunk.DetailLevel + 1, newPos);
@@ -65,14 +67,14 @@ public class MeshGen : MonoBehaviour{
                 chunk.Children[i] = newChunk;
             
             }
-            //testing
-            // if (chunk.DetailLevel < 7) {
-            //     for (int i = 0; i < 4; i++) {
-            //         if (Random.value < 0.6f) {
-            //             SplitMesh(chunk.Children[i]);
-            //         }
-            //     }
-            // }
+            // testing
+             if (chunk.DetailLevel < 4) {
+                 for (int i = 0; i < 4; i++) {
+                     if (Random.value < 0.6f) {
+                         SplitMesh(chunk.Children[i]);
+                     }
+                 }
+             }
 
 
         }
@@ -93,8 +95,11 @@ public class MeshGen : MonoBehaviour{
         }
     }
 
+    private float GetMeshHeight(float x, float y){
+        return Mathf.PerlinNoise(x/5, y/5) + Mathf.PerlinNoise(x/30, y/30)*10 + Mathf.PerlinNoise(x, y)*.2f;
+    }
 
-    private Mesh GenMesh(int detailLevel){
+    private Mesh GenMesh(int detailLevel, Vector2 globalPos){
         Mesh m = new Mesh();
         
         
@@ -102,7 +107,13 @@ public class MeshGen : MonoBehaviour{
         for (int y = 0; y < MeshCellCount + 1; y++) {
             for (int x = 0; x < MeshCellCount + 1; x++) {
                 float scale = MathF.Pow(2, detailLevel);
-                vertices[y * (MeshCellCount + 1) + x] = new Vector3(x * CellSize / scale, 0, y * CellSize / scale);
+
+
+                float xPos = x * CellSize / scale;
+                float yPos = y * CellSize / scale;
+                float height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
+                
+                vertices[y * (MeshCellCount + 1) + x] = new Vector3(xPos, height, yPos);
             }
         }
 

@@ -5,10 +5,13 @@ using UnityEngine;
 public class MeshChunk{
     public GameObject MeshGO;
     public MeshChunk ParentChunk;
+    
     public int DetailLevel;
-    public Vector3 Pos;
+    public Vector3 Pos; //bottom left
+    
     public bool HasChildren;
     public MeshChunk[] Children;
+    
     public int[] PathArray;
 
     public MeshChunk(int detailLevel, Vector3 pos){

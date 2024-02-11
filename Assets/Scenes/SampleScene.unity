@@ -149,8 +149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad70ef80e52779f479e6bbf4b3774326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CellSize: 16
-  MeshCellCount: 1
+  RootMeshWidth: 32
+  MeshCellCount: 32
 --- !u!4 &203957868
 Transform:
   m_ObjectHideFlags: 0
