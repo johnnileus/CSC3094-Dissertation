@@ -11,9 +11,50 @@ public class MeshGen : MonoBehaviour{
 
     private float CellSize;
     private MeshChunk RootChunk;
+
+    private GameObject player;
+
+    private Dictionary<int, float> detailDistances = new Dictionary<int, float>() {
+        { 0, 256f },
+        { 1, 128f },
+        { 2, 64f },
+        { 3, 32f },
+        { 4, 16f },
+        { 5, 8f },
+        { 6, 4f },
+        { 7, 2f }
+    };
     
-    // Start is called before the first frame update
+    private void CheckChunkDistance(MeshChunk chunk){
+        
+        float offset = RootMeshWidth / MathF.Pow(2, chunk.DetailLevel + 1);
+        Vector3 chunkCenter = chunk.Pos + new Vector3(offset, 0, offset);
+        float dist = Vector2.Distance(new Vector2(chunkCenter.x, chunkCenter.z), new Vector2(player.transform.position.x, player.transform.position.z));
+        
+        if (chunk.HasChildren) {
+            if (dist > detailDistances[chunk.DetailLevel]*32) {
+                MergeMesh(chunk);
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    CheckChunkDistance(chunk.Children[i]);
+                }
+            }
+        }
+        else {
+            if (chunk.DetailLevel < detailDistances.Count && dist < detailDistances[chunk.DetailLevel]*32) {
+                SplitMesh(chunk);
+            }
+        }
+    }
+    
+    private void Update(){
+        CheckChunkDistance(RootChunk);
+    }
+    
     void Start(){
+
+        player = GameObject.FindWithTag("Player");
+        
         RootChunk = new MeshChunk(0, new Vector3(0,0,0));
         CellSize = RootMeshWidth / MeshCellCount;
 
@@ -24,7 +65,7 @@ public class MeshGen : MonoBehaviour{
         meshObj.transform.parent = transform;
         RootChunk.MeshGO = meshObj;
         
-        SplitMesh(RootChunk);
+        // SplitMesh(RootChunk);
         // SplitMesh(RootChunk.Children[0]);
         // SplitMesh(RootChunk.Children[0].Children[0]);
         
@@ -68,13 +109,13 @@ public class MeshGen : MonoBehaviour{
             
             }
             // testing
-             if (chunk.DetailLevel < 4) {
-                 for (int i = 0; i < 4; i++) {
-                     if (Random.value < 0.6f) {
-                         SplitMesh(chunk.Children[i]);
-                     }
-                 }
-             }
+            // if (chunk.DetailLevel < 4) {
+            //     for (int i = 0; i < 4; i++) {
+            //         if (Random.value < 0.6f) {
+            //             SplitMesh(chunk.Children[i]);
+            //         }
+            //     }
+            // }
 
 
         }
@@ -96,7 +137,7 @@ public class MeshGen : MonoBehaviour{
     }
 
     private float GetMeshHeight(float x, float y){
-        return Mathf.PerlinNoise(x/5, y/5) + Mathf.PerlinNoise(x/30, y/30)*10 + Mathf.PerlinNoise(x, y)*.2f;
+        return Mathf.PerlinNoise(x/30, y/30)*5 + Mathf.PerlinNoise(x/300, y/300)*50 + Mathf.PerlinNoise(x/5, y/5);
     }
 
     private Mesh GenMesh(int detailLevel, Vector2 globalPos){
