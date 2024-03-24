@@ -15,14 +15,14 @@ public class MeshGen : MonoBehaviour{
     private GameObject player;
 
     private Dictionary<int, float> detailDistances = new Dictionary<int, float>() {
-        { 0, 256f },
-        { 1, 128f },
-        { 2, 64f },
-        { 3, 32f },
-        { 4, 16f },
-        { 5, 8f },
-        { 6, 4f },
-        { 7, 2f }
+        { 0, 128f },
+        { 1, 64f },
+        { 2, 32f },
+        { 3, 16f },
+        { 4, 8f },
+        { 5, 4f },
+        { 6, 2f },
+        { 7, 1f }
     };
     
     private void CheckChunkDistance(MeshChunk chunk){
@@ -135,9 +135,11 @@ public class MeshGen : MonoBehaviour{
             chunk.MeshGO.GetComponent<MeshRenderer>().enabled = true;
         }
     }
-
+    
+    
+    
     private float GetMeshHeight(float x, float y){
-        return Mathf.PerlinNoise(x/30, y/30)*5 + Mathf.PerlinNoise(x/300, y/300)*50 + Mathf.PerlinNoise(x/5, y/5);
+        return Mathf.PerlinNoise(x/30, y/30)*5 + Mathf.PerlinNoise(x/300, y/300)*100 + Mathf.PerlinNoise(x/5, y/5);
     }
 
     private Mesh GenMesh(int detailLevel, Vector2 globalPos){
