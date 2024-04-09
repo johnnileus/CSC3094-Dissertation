@@ -51,6 +51,8 @@ public class MeshGen : MonoBehaviour{
         CheckChunkDistance(RootChunk);
     }
     
+    
+    
     void Start(){
 
         player = GameObject.FindWithTag("Player");
