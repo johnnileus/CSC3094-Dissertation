@@ -57,7 +57,6 @@ public class MeshGen : MonoBehaviour{
         
         RootChunk = new MeshChunk(0, new Vector3(0,0,0));
         CellSize = RootMeshWidth / MeshCellCount;
-
         GameObject meshObj = new GameObject("root");
         meshObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
         meshObj.AddComponent<MeshFilter>().sharedMesh = GenMesh(0, Vector2.zero);

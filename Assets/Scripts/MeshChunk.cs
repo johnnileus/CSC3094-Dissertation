@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 
 public class MeshChunk{
     public GameObject MeshGO;
     public MeshChunk ParentChunk;
-    
-    public List<int> NorthPath = new List<int>();
-    public List<int> EastPath = new List<int>();
-    public List<int> SouthPath = new List<int>();
-    public List<int> WestPath = new List<int>();
+
+
+
     
     public int DetailLevel;
     public Vector3 Pos; //bottom left
@@ -23,4 +22,5 @@ public class MeshChunk{
         HasChildren = false;
         Children = null;
     }
+    
 }
