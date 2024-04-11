@@ -8,17 +8,17 @@ public class QuadTreeNeighbourTest : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start() {
-        int[] path = { 3,1,1 };
+        List<int> path = new List<int> { 3, 2, 0 };
         FindQuadTreeNeighbour(path, 'N');
         FindQuadTreeNeighbour(path, 'E');
-        FindQuadTreeNeighbour(path, 'W');
         FindQuadTreeNeighbour(path, 'S');
+        FindQuadTreeNeighbour(path, 'W');
         
     }
 
-    private int ListToInt(int[] lst) {
+    private int ListToInt(List<int> lst) {
         int num = 0;
-        for (int i = 0; i < lst.Length; i++) {
+        for (int i = 0; i < lst.Count; i++) {
             num <<= 1;
             if (lst[i] == 1) {
                 num++;
@@ -27,35 +27,32 @@ public class QuadTreeNeighbourTest : MonoBehaviour
 
         return num;
     }
-    private int[] IntToList(int num, int detailLevel) {
+    private List<int> IntToList(int num, int detailLevel) {
         List<int> lst = new List<int>();
 
         for (int i = 0; i < detailLevel; i++) {
             lst.Add(num%2);
             num >>= 1;
         }
-        
-        int[] output = new int[lst.Count];
+
         lst.Reverse();
-        for (int i = 0; i < lst.Count; i++) {
-            output[i] = lst[i];
-        }
 
-        return output;
+
+        return lst;
     }
-    private int[] FindQuadTreeNeighbour(int[] path, char dir) {
+    private List<int> FindQuadTreeNeighbour(List<int> path, char dir) {
 
-        int detailLevel = path.Length;
-        int[] newPath = new int[detailLevel];
-        int[] binX = new int[detailLevel];
-        int[] binY = new int[detailLevel];
+        int detailLevel = path.Count;
+        List<int> newPath = new List<int>();
+        List<int> binX = new List<int>();
+        List<int> binY = new List<int>();
         
         //convert path to x,y coords in binary
-        for (int i = 0; i < path.Length; i++) {
+        for (int i = 0; i < path.Count; i++) {
             int val = path[i];
 
-            binX[i] = val % 2;
-            binY[i] = (val >> 1)%2;
+            binX.Add(val % 2);
+            binY.Add((val >> 1)%2);
 
         }
 
@@ -76,7 +73,6 @@ public class QuadTreeNeighbourTest : MonoBehaviour
                     print("no east neighbour");
                     return null;
                 }
-                print($"xcoord = {xCoord}");
                 binX = IntToList(xCoord + 1, detailLevel);
                 break;
             }case 'S': {
@@ -97,15 +93,15 @@ public class QuadTreeNeighbourTest : MonoBehaviour
         }
 
         for (int i = 0; i < detailLevel; i++) {
-            newPath[i] = binX[i] + 2 * binY[i];
+            newPath.Add(binX[i] + 2 * binY[i]);
         }
 
         //print new path
         string str = "";
-        for (int i = 0; i < newPath.Length; i++) {
+        for (int i = 0; i < newPath.Count; i++) {
             str += newPath[i];
         }
-        print(str);
+        print($"{dir} {str}");
         
         
         return newPath;
