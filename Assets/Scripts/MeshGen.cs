@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 public class MeshGen : MonoBehaviour{
@@ -48,7 +49,7 @@ public class MeshGen : MonoBehaviour{
     }
     
     private void Update(){
-        //CheckChunkDistance(RootChunk);
+        // CheckChunkDistance(RootChunk);
     }
     
     private int ListToInt(List<int> lst) {
@@ -130,14 +131,6 @@ public class MeshGen : MonoBehaviour{
         for (int i = 0; i < detailLevel; i++) {
             newPath.Add(binX[i] + 2 * binY[i]);
         }
-        //
-        // string str = "";
-        // for (int i = 0; i < newPath.Count; i++) { 
-        //     str += newPath[i];
-        // }
-        // print($"{dir} {str}");
-        
-        
         return newPath;
 
     }
@@ -158,8 +151,11 @@ public class MeshGen : MonoBehaviour{
         RootChunk.MeshGO = meshObj;
         
         SplitMesh(RootChunk);
-        //SplitMesh(RootChunk.Children[0]);
-        //SplitMesh(RootChunk.Children[0].Children[0]);
+        SplitMesh(RootChunk.Children[2]);
+        SplitMesh(RootChunk.Children[2].Children[0]);
+        SplitMesh(RootChunk.Children[2].Children[0].Children[0]);
+        SplitMesh(RootChunk.Children[2].Children[0].Children[0].Children[0]);
+        SplitMesh(RootChunk.Children[2].Children[0].Children[0].Children[0].Children[0]);
         
         // RootChunk.PrintPath();
 
@@ -247,8 +243,8 @@ public class MeshGen : MonoBehaviour{
         }
     }
     
-    private float GetMeshHeight(float x, float y){
-        return Mathf.PerlinNoise(x/30, y/30)*5 + Mathf.PerlinNoise(x/300, y/300)*100 + Mathf.PerlinNoise(x/5, y/5);
+    private float GetMeshHeight(float x, float z){
+        return 10*(Mathf.PerlinNoise(x/30, z/30)*5 + Mathf.PerlinNoise(x/300, z/300)*100 + Mathf.PerlinNoise(x/5, z/5));
     }
 
     private MeshChunk GetChunkFromPath(List<int> path) {
@@ -272,8 +268,10 @@ public class MeshGen : MonoBehaviour{
         }
         return chunk;
     }
+    
 
-    private Mesh GenMesh(int detailLevel, Vector2 globalPos, MeshChunk chunk){
+    private Mesh GenMesh(int detailLevel, Vector2 globalPos, MeshChunk chunk) {
+        //print(detailLevel);
         Mesh m = new Mesh();
 
         MeshChunk[] neighbours = new MeshChunk[4];
@@ -287,28 +285,59 @@ public class MeshGen : MonoBehaviour{
             }
             
         }
-
-        for (int i = 0; i < 4; i++) {
-            MeshChunk neighbour = neighbours[i];
-            if (neighbour == null)
-            {
-                print($"aa dir:{i} no neighbour");
-            } else
-            {
-                neighbour.PrintPath($"aa dir:{i}, detailLevel:{neighbour.DetailLevel}");
-            }
-            
-        }
+        
+        //check rotation
+        
         
         Vector3[] vertices = new Vector3[(MeshCellCount + 1) * (MeshCellCount + 1)];
+        bool attachNorth = true;
+        float chunkCellSize = CellSize / Mathf.Pow(2, detailLevel);
+        float neighbourCellOffset = 0;
+        float neighbourCellSize = 0;
+        
+        if (neighbours[2] != null) {
+            int detailDiff = detailLevel - neighbours[2].DetailLevel;
+            if (detailDiff <= 0) {
+                attachNorth = false;
+            } else {
+                neighbourCellOffset = neighbours[2].Pos[0];
+                neighbourCellSize = CellSize / Mathf.Pow(2, neighbours[2].DetailLevel);
+            }
+        } else {
+            attachNorth = false;
+        }
+        
+        
+        
         for (int y = 0; y < MeshCellCount + 1; y++) {
             for (int x = 0; x < MeshCellCount + 1; x++) {
+            
                 float scale = MathF.Pow(2, detailLevel);
-
-
                 float xPos = x * CellSize / scale;
                 float yPos = y * CellSize / scale;
-                float height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
+                float height;
+                
+            
+                if (y == 0 && attachNorth) {
+                    float xCoord = x * chunkCellSize + chunk.Pos[0] - neighbourCellOffset;
+                    
+                    //floating point error, cant use %
+                    float chunkProgress = xCoord / neighbourCellSize;
+                    int node = Mathf.FloorToInt(chunkProgress);
+                    float progress = chunkProgress - node;
+                    
+                    float h1 = GetMeshHeight(neighbours[2].Pos[0] + node * neighbourCellSize, chunk.Pos[2]);
+                    float h2 = GetMeshHeight(neighbours[2].Pos[0] + (node+1) * neighbourCellSize, chunk.Pos[2]);
+                    height = Mathf.Lerp(h1, h2, progress);
+                    print($"{x} {y}, {node} {xCoord} {neighbourCellSize} {progress}");
+                } else {
+                    height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
+                }
+                
+
+                //height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
+                
+                
                 
                 vertices[y * (MeshCellCount + 1) + x] = new Vector3(xPos, height, yPos);
             }

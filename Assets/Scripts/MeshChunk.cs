@@ -12,7 +12,7 @@ public class MeshChunk{
 
     
     public int DetailLevel;
-    public Vector3 Pos; //bottom left
+    public Vector3 Pos; //bottom left anchor
     
     public bool HasChildren;
     public MeshChunk[] Children;
