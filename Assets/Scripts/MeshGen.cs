@@ -49,7 +49,7 @@ public class MeshGen : MonoBehaviour{
     }
     
     private void Update(){
-        // CheckChunkDistance(RootChunk);
+        //CheckChunkDistance(RootChunk);
     }
     
     private int ListToInt(List<int> lst) {
@@ -140,7 +140,7 @@ public class MeshGen : MonoBehaviour{
 
         player = GameObject.FindWithTag("Player");
         
-        RootChunk = new MeshChunk(0, new Vector3(0,0,0));
+        RootChunk = new MeshChunk(0, new Vector3(0,0,0), CellSize);
         RootChunk.Path = new List<int>{ };
         CellSize = RootMeshWidth / MeshCellCount;
         GameObject meshObj = new GameObject("root");
@@ -151,11 +151,9 @@ public class MeshGen : MonoBehaviour{
         RootChunk.MeshGO = meshObj;
         
         SplitMesh(RootChunk);
-        SplitMesh(RootChunk.Children[2]);
-        SplitMesh(RootChunk.Children[2].Children[0]);
-        SplitMesh(RootChunk.Children[2].Children[0].Children[0]);
-        SplitMesh(RootChunk.Children[2].Children[0].Children[0].Children[0]);
-        SplitMesh(RootChunk.Children[2].Children[0].Children[0].Children[0].Children[0]);
+        SplitMesh(RootChunk.Children[0]);
+        SplitMesh(RootChunk.Children[0].Children[3]);
+
         
         // RootChunk.PrintPath();
 
@@ -195,7 +193,7 @@ public class MeshGen : MonoBehaviour{
                 
                 newObj.transform.position = chunk.Pos + cellOffsets[i];
                 
-                MeshChunk newChunk = new MeshChunk(chunk.DetailLevel + 1, newPos);
+                MeshChunk newChunk = new MeshChunk(chunk.DetailLevel + 1, newPos, CellSize);
                 newChunk.Path = new List<int>(chunk.Path);
                 newChunk.Path.Add(i);
                 
@@ -291,21 +289,25 @@ public class MeshGen : MonoBehaviour{
         
         Vector3[] vertices = new Vector3[(MeshCellCount + 1) * (MeshCellCount + 1)];
         bool attachNorth = true;
-        float chunkCellSize = CellSize / Mathf.Pow(2, detailLevel);
-        float neighbourCellOffset = 0;
-        float neighbourCellSize = 0;
+        bool attachEast = true;
+        bool attachSouth = true;
+        bool attachWest = true;
         
-        if (neighbours[2] != null) {
-            int detailDiff = detailLevel - neighbours[2].DetailLevel;
-            if (detailDiff <= 0) {
-                attachNorth = false;
-            } else {
-                neighbourCellOffset = neighbours[2].Pos[0];
-                neighbourCellSize = CellSize / Mathf.Pow(2, neighbours[2].DetailLevel);
-            }
-        } else {
+        float chunkCellSize = CellSize / Mathf.Pow(2, detailLevel);
+        
+        if (neighbours[0] == null || detailLevel - neighbours[0].DetailLevel <= 0) {
             attachNorth = false;
         }
+        if (neighbours[1] == null || detailLevel - neighbours[1].DetailLevel <= 0) {
+            attachEast = false;
+        }
+        if (neighbours[2] == null || detailLevel - neighbours[2].DetailLevel <= 0) {
+            attachSouth = false;
+        }
+        if (neighbours[3] == null || detailLevel - neighbours[3].DetailLevel <= 0) {
+            attachWest = false;
+        }
+        
         
         
         
@@ -317,22 +319,56 @@ public class MeshGen : MonoBehaviour{
                 float yPos = y * CellSize / scale;
                 float height;
                 
-            
-                if (y == 0 && attachNorth) {
-                    float xCoord = x * chunkCellSize + chunk.Pos[0] - neighbourCellOffset;
-                    
+                if (y == MeshCellCount && attachNorth) {
+                    float xCoord = x * chunkCellSize + chunk.Pos[0] - neighbours[0].Pos[0];
                     //floating point error, cant use %
-                    float chunkProgress = xCoord / neighbourCellSize;
+                    float chunkProgress = xCoord / neighbours[0].CellSize;
                     int node = Mathf.FloorToInt(chunkProgress);
                     float progress = chunkProgress - node;
                     
-                    float h1 = GetMeshHeight(neighbours[2].Pos[0] + node * neighbourCellSize, chunk.Pos[2]);
-                    float h2 = GetMeshHeight(neighbours[2].Pos[0] + (node+1) * neighbourCellSize, chunk.Pos[2]);
+                    float h1 = GetMeshHeight(neighbours[0].Pos[0] + node * neighbours[0].CellSize, chunk.Pos[2] + yPos);
+                    float h2 = GetMeshHeight(neighbours[0].Pos[0] + (node+1) * neighbours[0].CellSize, chunk.Pos[2] + yPos);
                     height = Mathf.Lerp(h1, h2, progress);
-                    print($"{x} {y}, {node} {xCoord} {neighbourCellSize} {progress}");
-                } else {
+                }else if (x == MeshCellCount && attachEast) {
+                        
+                    float yCoord = y * chunkCellSize + chunk.Pos[2] - neighbours[1].Pos[2];
+                
+                    float chunkProgress = yCoord / neighbours[1].CellSize;
+                    int node = Mathf.FloorToInt(chunkProgress);
+                    float progress = chunkProgress - node;
+                    
+                    float h1 = GetMeshHeight(chunk.Pos[0] + xPos, neighbours[1].Pos[2] + node * neighbours[1].CellSize);
+                    float h2 = GetMeshHeight(chunk.Pos[0] + xPos, neighbours[1].Pos[2] + (node+1) * neighbours[1].CellSize);
+                    height = Mathf.Lerp(h1, h2, progress);
+                }
+                else if (y == 0 && attachSouth) {
+                    float xCoord = x * chunkCellSize + chunk.Pos[0] - neighbours[2].Pos[0];
+                    //floating point error, cant use %
+                    float chunkProgress = xCoord / neighbours[2].CellSize;
+                    int node = Mathf.FloorToInt(chunkProgress);
+                    float progress = chunkProgress - node;
+                    
+                    float h1 = GetMeshHeight(neighbours[2].Pos[0] + node * neighbours[2].CellSize, chunk.Pos[2]);
+                    float h2 = GetMeshHeight(neighbours[2].Pos[0] + (node+1) * neighbours[2].CellSize, chunk.Pos[2]);
+                    height = Mathf.Lerp(h1, h2, progress);
+                    print($"{x} {y}, {node} {xCoord} {neighbours[2].CellSize} {progress}");
+                } 
+                else if (x == 0 && attachWest) {
+                    
+                    float yCoord = y * chunkCellSize + chunk.Pos[2] - neighbours[3].Pos[2];
+                
+                    float chunkProgress = yCoord / neighbours[3].CellSize;
+                    int node = Mathf.FloorToInt(chunkProgress);
+                    float progress = chunkProgress - node;
+                    
+                    float h1 = GetMeshHeight(chunk.Pos[0], neighbours[3].Pos[2] + node * neighbours[3].CellSize);
+                    float h2 = GetMeshHeight(chunk.Pos[0], neighbours[3].Pos[2] + (node+1) * neighbours[3].CellSize);
+                    height = Mathf.Lerp(h1, h2, progress);
+                }
+                else {
                     height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
                 }
+                
                 
 
                 //height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);

@@ -12,16 +12,18 @@ public class MeshChunk{
 
     
     public int DetailLevel;
+    public float CellSize;
     public Vector3 Pos; //bottom left anchor
     
     public bool HasChildren;
     public MeshChunk[] Children;
 
-    public MeshChunk(int detailLevel, Vector3 pos){
+    public MeshChunk(int detailLevel, Vector3 pos, float globalCellSize){
         DetailLevel = detailLevel;
         Pos = pos;
         HasChildren = false;
         Children = null;
+        CellSize = globalCellSize / Mathf.Pow(2, detailLevel);
     }
     
     public void PrintPath(string prefix) {
