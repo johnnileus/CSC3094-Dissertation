@@ -49,7 +49,7 @@ public class MeshGen : MonoBehaviour{
     }
     
     private void Update(){
-        //CheckChunkDistance(RootChunk);
+        CheckChunkDistance(RootChunk);
     }
     
     private int ListToInt(List<int> lst) {
@@ -150,10 +150,10 @@ public class MeshGen : MonoBehaviour{
         meshObj.transform.parent = transform;
         RootChunk.MeshGO = meshObj;
         
-        SplitMesh(RootChunk);
-        SplitMesh(RootChunk.Children[0]);
-        SplitMesh(RootChunk.Children[0].Children[3]);
-
+        // SplitMesh(RootChunk);
+        // SplitMesh(RootChunk.Children[0]);
+        // SplitMesh(RootChunk.Children[0].Children[2]);
+        // SplitMesh(RootChunk.Children[0].Children[3]);
         
         // RootChunk.PrintPath();
 
@@ -165,6 +165,49 @@ public class MeshGen : MonoBehaviour{
         // MergeMesh(RootChunk.Children[0]);
 
     }
+
+    private List<MeshChunk> FindChunksOnBorder(MeshChunk chunk, int dir) {
+        List<MeshChunk> output = new List<MeshChunk>();
+        List<MeshChunk> listToCheck = new List<MeshChunk>();
+        listToCheck.Add(chunk);
+        
+        while (listToCheck.Count > 0) {
+            
+            MeshChunk chunkToCheck = listToCheck[0];
+            if (chunkToCheck.HasChildren) {
+                switch (dir) {
+                    case 2: {
+                        listToCheck.Add(chunkToCheck.Children[2]);
+                        listToCheck.Add(chunkToCheck.Children[3]);
+                        break;
+                    }case 3: {
+                        listToCheck.Add(chunkToCheck.Children[1]);
+                        listToCheck.Add(chunkToCheck.Children[3]);
+                        break;
+                    }case 0: {
+                        listToCheck.Add(chunkToCheck.Children[0]);
+                        listToCheck.Add(chunkToCheck.Children[1]);
+                        break;
+                    }case 1: {
+                        listToCheck.Add(chunkToCheck.Children[0]);
+                        listToCheck.Add(chunkToCheck.Children[2]);
+                        break;
+                    }
+                }
+            } else {
+                output.Add(chunkToCheck);
+            }
+            listToCheck.RemoveAt(0);
+        }
+        
+        
+        return output;
+    }
+    
+    private void RecalculateNeighbourMeshes() {
+        
+    }
+    
     //splits chunk into 4 child meshes
     private void SplitMesh(MeshChunk chunk){
         if (!chunk.HasChildren) {
@@ -198,8 +241,6 @@ public class MeshGen : MonoBehaviour{
                 newChunk.Path.Add(i);
                 
                 newObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
-                // newObj.AddComponent<MeshFilter>().sharedMesh = GenMesh(chunk.DetailLevel + 1,
-                //     new Vector2(newPos.x, newPos.z), newChunk);
             
                 newChunk.MeshGO = newObj;
                 newChunk.ParentChunk = chunk;
@@ -213,14 +254,21 @@ public class MeshGen : MonoBehaviour{
                     new Vector2(newPos.x, newPos.z), childChunk);
             }
             
-            // testing
-            // if (chunk.DetailLevel < 4) {
-            //     for (int i = 0; i < 4; i++) {
-            //         if (Random.value < 0.6f) {
-            //             SplitMesh(chunk.Children[i]);
-            //         }
-            //     }
-            // }
+            //recalculate neighbour meshes
+            for (int i = 0; i < 4; i++) {
+                List<int> path = FindQuadTreeNeighbourPath(chunk, i);
+                if (path != null) {
+                    MeshChunk neighbour = GetChunkFromPath(path);
+                    List<MeshChunk> children = FindChunksOnBorder(neighbour, i);
+                    foreach (var child in children) {
+                        print(child.MeshGO);
+                        child.MeshGO.GetComponent<MeshFilter>().mesh = GenMesh(child.DetailLevel, new Vector2(child.Pos.x, child.Pos.z), child);
+                        print($"{i}");
+                    }
+                }
+                
+            }
+            
 
 
         }
@@ -238,6 +286,21 @@ public class MeshGen : MonoBehaviour{
 
             chunk.Children = null;
             chunk.MeshGO.GetComponent<MeshRenderer>().enabled = true;
+        }
+        
+        //recalculate neighbour meshes
+        for (int i = 0; i < 4; i++) {
+            List<int> path = FindQuadTreeNeighbourPath(chunk, i);
+            if (path != null) {
+                MeshChunk neighbour = GetChunkFromPath(path);
+                List<MeshChunk> children = FindChunksOnBorder(neighbour, i);
+                foreach (var child in children) {
+                    print(child.MeshGO);
+                    child.MeshGO.GetComponent<MeshFilter>().mesh = GenMesh(child.DetailLevel, new Vector2(child.Pos.x, child.Pos.z), child);
+                    print($"{i}");
+                }
+            }
+                
         }
     }
     
@@ -267,7 +330,7 @@ public class MeshGen : MonoBehaviour{
         return chunk;
     }
     
-
+    //todo fix corner cracks
     private Mesh GenMesh(int detailLevel, Vector2 globalPos, MeshChunk chunk) {
         //print(detailLevel);
         Mesh m = new Mesh();
@@ -283,8 +346,6 @@ public class MeshGen : MonoBehaviour{
             }
             
         }
-        
-        //check rotation
         
         
         Vector3[] vertices = new Vector3[(MeshCellCount + 1) * (MeshCellCount + 1)];
@@ -351,7 +412,6 @@ public class MeshGen : MonoBehaviour{
                     float h1 = GetMeshHeight(neighbours[2].Pos[0] + node * neighbours[2].CellSize, chunk.Pos[2]);
                     float h2 = GetMeshHeight(neighbours[2].Pos[0] + (node+1) * neighbours[2].CellSize, chunk.Pos[2]);
                     height = Mathf.Lerp(h1, h2, progress);
-                    print($"{x} {y}, {node} {xCoord} {neighbours[2].CellSize} {progress}");
                 } 
                 else if (x == 0 && attachWest) {
                     
