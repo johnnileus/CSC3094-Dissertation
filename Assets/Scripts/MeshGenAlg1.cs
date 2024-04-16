@@ -261,9 +261,7 @@ public class MeshGen : MonoBehaviour{
                     MeshChunk neighbour = GetChunkFromPath(path);
                     List<MeshChunk> children = FindChunksOnBorder(neighbour, i);
                     foreach (var child in children) {
-                        print(child.MeshGO);
                         child.MeshGO.GetComponent<MeshFilter>().mesh = GenMesh(child.DetailLevel, new Vector2(child.Pos.x, child.Pos.z), child);
-                        print($"{i}");
                     }
                 }
                 
@@ -295,9 +293,7 @@ public class MeshGen : MonoBehaviour{
                 MeshChunk neighbour = GetChunkFromPath(path);
                 List<MeshChunk> children = FindChunksOnBorder(neighbour, i);
                 foreach (var child in children) {
-                    print(child.MeshGO);
                     child.MeshGO.GetComponent<MeshFilter>().mesh = GenMesh(child.DetailLevel, new Vector2(child.Pos.x, child.Pos.z), child);
-                    print($"{i}");
                 }
             }
                 
