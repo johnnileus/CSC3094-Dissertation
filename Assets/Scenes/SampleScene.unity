@@ -129,8 +129,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 203957868}
-  - component: {fileID: 203957867}
   - component: {fileID: 203957869}
+  - component: {fileID: 203957867}
   m_Layer: 0
   m_Name: Mesh Generator
   m_TagString: Untagged
@@ -145,13 +145,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203957866}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ad70ef80e52779f479e6bbf4b3774326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RootMeshWidth: 128
-  MeshCellCount: 19
+  RootMeshWidth: 4096
+  MeshCellCount: 11
 --- !u!4 &203957868
 Transform:
   m_ObjectHideFlags: 0
@@ -174,11 +174,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203957866}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3aecd76aeb717ed44800aec2eac4cb94, type: 3}
+  m_Script: {fileID: 11500000, guid: c557e755603a4cf46b1d3cdc26a9bee9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RootMeshWidth: 4096
+  MeshCellCount: 11
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

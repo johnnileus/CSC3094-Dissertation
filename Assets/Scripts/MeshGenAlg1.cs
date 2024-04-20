@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
-public class MeshGen : MonoBehaviour{
+public class MeshGenAlg1 : MonoBehaviour{
     [SerializeField] private float RootMeshWidth;
     [SerializeField] private int MeshCellCount;
 
