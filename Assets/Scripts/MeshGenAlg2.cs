@@ -137,8 +137,7 @@ public class MeshGenAlg2 : MonoBehaviour{
         Mesh m = new Mesh();
         
         int skirtVertexOffset = (MeshCellCount + 1) * (MeshCellCount + 1);
-        
-        Vector3[] vertices = new Vector3[skirtVertexOffset + 4 * MeshCellCount + 1];
+        Vector3[] vertices = new Vector3[skirtVertexOffset + 8*(MeshCellCount+1)];
         for (int y = 0; y < MeshCellCount + 1; y++) {
             for (int x = 0; x < MeshCellCount + 1; x++) {
                 float scale = MathF.Pow(2, detailLevel);
@@ -151,17 +150,31 @@ public class MeshGenAlg2 : MonoBehaviour{
                 
                 
                 if (y == 0) { //bottom row
-                    vertices[skirtVertexOffset + x] = new Vector3(xPos, height - skirtHeight, yPos);
+                    vertices[skirtVertexOffset + 2 * x] = new Vector3(xPos, height, yPos);
+                    vertices[skirtVertexOffset + 2 * x + 1] = new Vector3(xPos, height - skirtHeight, yPos);
+                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
                     Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
-                } else if (y == MeshCellCount) { //top row
-                    vertices[skirtVertexOffset + 3*MeshCellCount + x] = new Vector3(xPos, height - skirtHeight, yPos);
+                } 
+                if (y == MeshCellCount) { //top row
+                    vertices[skirtVertexOffset + 4 * (MeshCellCount + 1) + 2 * x] = new Vector3(xPos, height, yPos);
+                    vertices[skirtVertexOffset + 4 * (MeshCellCount + 1) + 2 * x + 1] = new Vector3(xPos, height - skirtHeight, yPos);
+                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
                     Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
-                } else if (x == 0) { // l;eft side
-                    vertices[skirtVertexOffset + MeshCellCount + y] = new Vector3(xPos, height - skirtHeight, yPos);
+
+                }
+                if (x == 0) { // left side
+                    vertices[skirtVertexOffset + 2 * (MeshCellCount + 1) + 2 * y] = new Vector3(xPos, height, yPos);
+                    vertices[skirtVertexOffset + 2 * (MeshCellCount + 1) + 2 * y + 1] = new Vector3(xPos, height - skirtHeight, yPos);
+                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
                     Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
-                } else if (x == MeshCellCount) {
-                    vertices[skirtVertexOffset + MeshCellCount + y + 1] = new Vector3(xPos, height - skirtHeight, yPos);
+
+                } 
+                if (x == MeshCellCount) { // right
+                    vertices[skirtVertexOffset + 6 * (MeshCellCount + 1) + 2 * y] = new Vector3(xPos, height, yPos);
+                    vertices[skirtVertexOffset + 6 * (MeshCellCount + 1) + 2 * y + 1] = new Vector3(xPos, height - skirtHeight, yPos);
+                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
                     Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
+
                 }
                 
                 vertices[y * (MeshCellCount + 1) + x] = new Vector3(xPos, height, yPos);
@@ -184,16 +197,7 @@ public class MeshGenAlg2 : MonoBehaviour{
                 triangles[tileNum + 5] = rootVert + 1;
 
                 if (y == 0) {
-                    triangles[skirtTriangleOffset + x*6] = x;
-                    triangles[skirtTriangleOffset + x*6 + 1] = x + skirtVertexOffset + 1;
-                    triangles[skirtTriangleOffset + x*6 + 2] = x + skirtVertexOffset;
                     
-                    triangles[skirtTriangleOffset + x*6 + 3] = x;
-                    triangles[skirtTriangleOffset + x*6 + 4] = x + 1;
-                    triangles[skirtTriangleOffset + x*6 + 5] = x + skirtVertexOffset + 1;
-                    
-                    
-                    print($"{skirtTriangleOffset} {x} {x + skirtVertexOffset + 1} {x + skirtVertexOffset}");
                 }
                 
             }
