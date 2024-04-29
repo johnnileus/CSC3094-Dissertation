@@ -67,9 +67,9 @@ public class MeshGenAlg2 : MonoBehaviour{
         meshObj.transform.parent = transform;
         RootChunk.MeshGO = meshObj;
         
-        // SplitMesh(RootChunk);
-        // SplitMesh(RootChunk.Children[0]);
-        // SplitMesh(RootChunk.Children[0].Children[0]);
+        SplitMesh(RootChunk);
+        SplitMesh(RootChunk.Children[0]);
+        SplitMesh(RootChunk.Children[0].Children[0]);
         
         //MergeMesh(RootChunk.Children[0]);
 
@@ -152,28 +152,20 @@ public class MeshGenAlg2 : MonoBehaviour{
                 if (y == 0) { //bottom row
                     vertices[skirtVertexOffset + 2 * x] = new Vector3(xPos, height, yPos);
                     vertices[skirtVertexOffset + 2 * x + 1] = new Vector3(xPos, height - skirtHeight, yPos);
-                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
-                    Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
                 } 
                 if (y == MeshCellCount) { //top row
                     vertices[skirtVertexOffset + 4 * (MeshCellCount + 1) + 2 * x] = new Vector3(xPos, height, yPos);
                     vertices[skirtVertexOffset + 4 * (MeshCellCount + 1) + 2 * x + 1] = new Vector3(xPos, height - skirtHeight, yPos);
-                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
-                    Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
 
                 }
                 if (x == 0) { // left side
                     vertices[skirtVertexOffset + 2 * (MeshCellCount + 1) + 2 * y] = new Vector3(xPos, height, yPos);
                     vertices[skirtVertexOffset + 2 * (MeshCellCount + 1) + 2 * y + 1] = new Vector3(xPos, height - skirtHeight, yPos);
-                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
-                    Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
 
                 } 
                 if (x == MeshCellCount) { // right
                     vertices[skirtVertexOffset + 6 * (MeshCellCount + 1) + 2 * y] = new Vector3(xPos, height, yPos);
                     vertices[skirtVertexOffset + 6 * (MeshCellCount + 1) + 2 * y + 1] = new Vector3(xPos, height - skirtHeight, yPos);
-                    Instantiate(testObj, new Vector3(xPos, height, yPos), Quaternion.identity);
-                    Instantiate(testObj, new Vector3(xPos, height - skirtHeight, yPos), Quaternion.identity);
 
                 }
                 
@@ -182,7 +174,7 @@ public class MeshGenAlg2 : MonoBehaviour{
         }
 
         int skirtTriangleOffset = MeshCellCount * MeshCellCount * 6;
-        int[] triangles = new int[skirtTriangleOffset + MeshCellCount * 12];
+        int[] triangles = new int[skirtTriangleOffset + 24 * MeshCellCount];
         for (int y = 0; y < MeshCellCount; y++) {
             for (int x = 0; x < MeshCellCount; x++) {
 
@@ -197,9 +189,48 @@ public class MeshGenAlg2 : MonoBehaviour{
                 triangles[tileNum + 5] = rootVert + 1;
 
                 if (y == 0) {
+                    triangles[skirtTriangleOffset + 6 * x + 0] = skirtVertexOffset + 2 * x + 0;
+                    triangles[skirtTriangleOffset + 6 * x + 1] = skirtVertexOffset + 2 * x + 3;
+                    triangles[skirtTriangleOffset + 6 * x + 2] = skirtVertexOffset + 2 * x + 1;
                     
+                    triangles[skirtTriangleOffset + 6 * x + 3] = skirtVertexOffset + 2 * x + 0;
+                    triangles[skirtTriangleOffset + 6 * x + 4] = skirtVertexOffset + 2 * x + 2;
+                    triangles[skirtTriangleOffset + 6 * x + 5] = skirtVertexOffset + 2 * x + 3;
                 }
-                
+                if (y == MeshCellCount - 1) {
+                    int o = 2*(MeshCellCount + 1) * 2;
+                    int s = 6*MeshCellCount * 2;
+                    triangles[skirtTriangleOffset + s + 6 * x + 0] = skirtVertexOffset + o + 2 * x + 2;
+                    triangles[skirtTriangleOffset + s + 6 * x + 1] = skirtVertexOffset + o + 2 * x + 1;
+                    triangles[skirtTriangleOffset + s + 6 * x + 2] = skirtVertexOffset + o + 2 * x + 3;
+                    
+                    triangles[skirtTriangleOffset + s + 6 * x + 3] = skirtVertexOffset + o + 2 * x + 2;
+                    triangles[skirtTriangleOffset + s + 6 * x + 4] = skirtVertexOffset + o + 2 * x + 0;
+                    triangles[skirtTriangleOffset + s + 6 * x + 5] = skirtVertexOffset + o + 2 * x + 1;
+                }
+
+                if (x == 0) {
+                    int o = 2 * (MeshCellCount + 1) * 1;
+                    int s = 6 * MeshCellCount * 1;
+                    triangles[skirtTriangleOffset + s + 6 * y + 0] = skirtVertexOffset + o + 2 * y + 2;
+                    triangles[skirtTriangleOffset + s + 6 * y + 1] = skirtVertexOffset + o + 2 * y + 1;
+                    triangles[skirtTriangleOffset + s + 6 * y + 2] = skirtVertexOffset + o + 2 * y + 3;
+
+                    triangles[skirtTriangleOffset + s + 6 * y + 3] = skirtVertexOffset + o + 2 * y + 2;
+                    triangles[skirtTriangleOffset + s + 6 * y + 4] = skirtVertexOffset + o + 2 * y + 0;
+                    triangles[skirtTriangleOffset + s + 6 * y + 5] = skirtVertexOffset + o + 2 * y + 1;
+                }
+                if (x == MeshCellCount - 1) {
+                    int o = 2 * (MeshCellCount + 1) * 3;
+                    int s = 6 * MeshCellCount * 3;
+                    triangles[skirtTriangleOffset + s + 6 * y + 0] = skirtVertexOffset + o + 2 * y + 0;
+                    triangles[skirtTriangleOffset + s + 6 * y + 1] = skirtVertexOffset + o + 2 * y + 3;
+                    triangles[skirtTriangleOffset + s + 6 * y + 2] = skirtVertexOffset + o + 2 * y + 1;
+
+                    triangles[skirtTriangleOffset + s + 6 * y + 3] = skirtVertexOffset + o + 2 * y + 0;
+                    triangles[skirtTriangleOffset + s + 6 * y + 4] = skirtVertexOffset + o + 2 * y + 2;
+                    triangles[skirtTriangleOffset + s + 6 * y + 5] = skirtVertexOffset + o + 2 * y + 3;
+                }
             }
         }
 
