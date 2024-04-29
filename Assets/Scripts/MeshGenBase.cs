@@ -19,8 +19,8 @@ public class MeshGenBase : MonoBehaviour{
         { 1, 128f },
         { 2, 64f },
         { 3, 32f },
-        { 4, 16f },
-        { 5, 8f },
+        { 4, 31.5f },
+        { 5, 28f },
         { 6, 4f },
         { 7, 2f }
     };

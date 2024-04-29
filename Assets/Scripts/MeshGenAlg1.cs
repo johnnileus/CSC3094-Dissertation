@@ -6,6 +6,8 @@ using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
+
+// moves vertices to match neighbour
 public class MeshGenAlg1 : MonoBehaviour{
     [SerializeField] private float RootMeshWidth;
     [SerializeField] private int MeshCellCount;
