@@ -188,7 +188,7 @@ public class MeshGenAlg2 : MonoBehaviour{
                 triangles[tileNum + 4] = rootVert + MeshCellCount + 2;
                 triangles[tileNum + 5] = rootVert + 1;
 
-                if (y == 0) {
+                if (y == 0) { //south
                     triangles[skirtTriangleOffset + 6 * x + 0] = skirtVertexOffset + 2 * x + 0;
                     triangles[skirtTriangleOffset + 6 * x + 1] = skirtVertexOffset + 2 * x + 3;
                     triangles[skirtTriangleOffset + 6 * x + 2] = skirtVertexOffset + 2 * x + 1;
@@ -197,7 +197,7 @@ public class MeshGenAlg2 : MonoBehaviour{
                     triangles[skirtTriangleOffset + 6 * x + 4] = skirtVertexOffset + 2 * x + 2;
                     triangles[skirtTriangleOffset + 6 * x + 5] = skirtVertexOffset + 2 * x + 3;
                 }
-                if (y == MeshCellCount - 1) {
+                if (y == MeshCellCount - 1) { //north
                     int o = 2*(MeshCellCount + 1) * 2;
                     int s = 6*MeshCellCount * 2;
                     triangles[skirtTriangleOffset + s + 6 * x + 0] = skirtVertexOffset + o + 2 * x + 2;
@@ -209,7 +209,7 @@ public class MeshGenAlg2 : MonoBehaviour{
                     triangles[skirtTriangleOffset + s + 6 * x + 5] = skirtVertexOffset + o + 2 * x + 1;
                 }
 
-                if (x == 0) {
+                if (x == 0) { //west
                     int o = 2 * (MeshCellCount + 1) * 1;
                     int s = 6 * MeshCellCount * 1;
                     triangles[skirtTriangleOffset + s + 6 * y + 0] = skirtVertexOffset + o + 2 * y + 2;
@@ -220,7 +220,7 @@ public class MeshGenAlg2 : MonoBehaviour{
                     triangles[skirtTriangleOffset + s + 6 * y + 4] = skirtVertexOffset + o + 2 * y + 0;
                     triangles[skirtTriangleOffset + s + 6 * y + 5] = skirtVertexOffset + o + 2 * y + 1;
                 }
-                if (x == MeshCellCount - 1) {
+                if (x == MeshCellCount - 1) { //east
                     int o = 2 * (MeshCellCount + 1) * 3;
                     int s = 6 * MeshCellCount * 3;
                     triangles[skirtTriangleOffset + s + 6 * y + 0] = skirtVertexOffset + o + 2 * y + 0;
