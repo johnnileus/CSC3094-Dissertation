@@ -19,8 +19,8 @@ public class MeshGenBase : MonoBehaviour{
         { 1, 128f },
         { 2, 64f },
         { 3, 32f },
-        { 4, 31.5f },
-        { 5, 28f },
+        { 4, 16f },
+        { 5, 8f },
         { 6, 4f },
         { 7, 2f }
     };
@@ -108,15 +108,6 @@ public class MeshGenBase : MonoBehaviour{
                 chunk.Children[i] = newChunk;
             
             }
-            // testing
-            // if (chunk.DetailLevel < 4) {
-            //     for (int i = 0; i < 4; i++) {
-            //         if (Random.value < 0.6f) {
-            //             SplitMesh(chunk.Children[i]);
-            //         }
-            //     }
-            // }
-
 
         }
         
@@ -136,8 +127,8 @@ public class MeshGenBase : MonoBehaviour{
         }
     }
 
-    private float GetMeshHeight(float x, float y){
-        return Mathf.PerlinNoise(x/30, y/30)*5 + Mathf.PerlinNoise(x/300, y/300)*50 + Mathf.PerlinNoise(x/5, y/5);
+    private float GetMeshHeight(float x, float z){
+        return 10*(Mathf.PerlinNoise(x/30, z/30)*5 + Mathf.PerlinNoise(x/300, z/300)*100 + Mathf.PerlinNoise(x/5, z/5));
     }
 
     private Mesh GenMesh(int detailLevel, Vector2 globalPos){
@@ -165,6 +156,7 @@ public class MeshGenBase : MonoBehaviour{
 
                 int tileNum = (MeshCellCount * y + x) * 6;
                 int rootVert = (MeshCellCount + 1) * y + x;
+                
                 triangles[tileNum] = rootVert + MeshCellCount + 1;
                 triangles[tileNum + 1] = rootVert + 1;
                 triangles[tileNum + 2] = rootVert;

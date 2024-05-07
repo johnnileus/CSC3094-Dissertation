@@ -129,8 +129,8 @@ public class MeshGenAlg2 : MonoBehaviour{
         }
     }
 
-    private float GetMeshHeight(float x, float y){
-        return Mathf.PerlinNoise(x/30, y/30)*50 + Mathf.PerlinNoise(x/300, y/300)*50 + Mathf.PerlinNoise(x/5, y/5);
+    private float GetMeshHeight(float x, float z){
+        return 10*(Mathf.PerlinNoise(x/30, z/30)*5 + Mathf.PerlinNoise(x/300, z/300)*100 + Mathf.PerlinNoise(x/5, z/5));
     }
 
     private Mesh GenMesh(int detailLevel, Vector2 globalPos){
@@ -166,7 +166,6 @@ public class MeshGenAlg2 : MonoBehaviour{
                 if (x == MeshCellCount) { // right
                     vertices[skirtVertexOffset + 6 * (MeshCellCount + 1) + 2 * y] = new Vector3(xPos, height, yPos);
                     vertices[skirtVertexOffset + 6 * (MeshCellCount + 1) + 2 * y + 1] = new Vector3(xPos, height - skirtHeight, yPos);
-
                 }
                 
                 vertices[y * (MeshCellCount + 1) + x] = new Vector3(xPos, height, yPos);

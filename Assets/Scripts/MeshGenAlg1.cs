@@ -18,14 +18,14 @@ public class MeshGenAlg1 : MonoBehaviour{
     private GameObject player;
 
     private Dictionary<int, float> detailDistances = new Dictionary<int, float>() {
-        { 0, 128f },
-        { 1, 64f },
-        { 2, 32f },
-        { 3, 16f },
-        { 4, 8f },
-        { 5, 4f },
-        { 6, 2f },
-        { 7, 1f }
+        { 0, 256f },
+        { 1, 128f },
+        { 2, 64f },
+        { 3, 32f },
+        { 4, 16f },
+        { 5, 8f },
+        { 6, 4f },
+        { 7, 2f }
     };
     
     private void CheckChunkDistance(MeshChunk chunk){
@@ -144,7 +144,7 @@ public class MeshGenAlg1 : MonoBehaviour{
         
         RootChunk = new MeshChunk(0, new Vector3(0,0,0), CellSize);
         RootChunk.Path = new List<int>{ };
-        CellSize = RootMeshWidth / MeshCellCount;
+        CellSize = RootMeshWidth / MeshCellCount; //reorder?
         GameObject meshObj = new GameObject("root");
         meshObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
         meshObj.AddComponent<MeshFilter>().sharedMesh = GenMesh(0, Vector2.zero, RootChunk);
@@ -206,10 +206,6 @@ public class MeshGenAlg1 : MonoBehaviour{
         return output;
     }
     
-    private void RecalculateNeighbourMeshes() {
-        
-    }
-    
     //splits chunk into 4 child meshes
     private void SplitMesh(MeshChunk chunk){
         if (!chunk.HasChildren) {
@@ -258,9 +254,9 @@ public class MeshGenAlg1 : MonoBehaviour{
             
             //recalculate neighbour meshes
             for (int i = 0; i < 4; i++) {
-                List<int> path = FindQuadTreeNeighbourPath(chunk, i);
+                List<int> path = FindQuadTreeNeighbourPath(chunk, i); //combine with genmesh for efficiency
                 if (path != null) {
-                    MeshChunk neighbour = GetChunkFromPath(path);
+                    MeshChunk neighbour = GetChunkFromPath(path);// possible error with being larger than node then looping over non-bordering children?
                     List<MeshChunk> children = FindChunksOnBorder(neighbour, i);
                     foreach (var child in children) {
                         child.MeshGO.GetComponent<MeshFilter>().mesh = GenMesh(child.DetailLevel, new Vector2(child.Pos.x, child.Pos.z), child);
