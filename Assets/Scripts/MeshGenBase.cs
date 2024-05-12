@@ -16,6 +16,8 @@ public class MeshGenBase : MonoBehaviour{
 
     private Dictionary<int, float> detailDistances = MeshGenCommon.detailDistances;
     
+    [SerializeField] private bool testGenMesh = true;
+    
     private void CheckChunkDistance(MeshChunk chunk){
         
         float offset = RootMeshWidth / MathF.Pow(2, chunk.DetailLevel + 1);
@@ -38,8 +40,32 @@ public class MeshGenBase : MonoBehaviour{
         }
     }
     
+    public void TestGenMesh() {
+        float startTime = Time.realtimeSinceStartup;
+        SplitMesh(RootChunk);
+        SplitMesh(RootChunk.Children[1]);
+        SplitMesh(RootChunk.Children[1].Children[2]);
+        SplitMesh(RootChunk.Children[1].Children[1]);
+
+        // private Mesh GenMesh(int detailLevel, Vector2 globalPos, MeshChunk chunk) {
+        for (int i = 0; i < 10000; i++) {
+            SplitMesh(RootChunk.Children[1].Children[1].Children[0]);
+            MergeMesh(RootChunk.Children[1].Children[1].Children[0]);
+        }
+        
+        float timeTaken = Time.realtimeSinceStartup - startTime;
+        print($"{timeTaken/10000 * 1000}ms"); 
+
+    }
+    
     private void Update(){
         CheckChunkDistance(RootChunk);
+        if (testGenMesh) {
+            testGenMesh = false;
+            TestGenMesh();
+        } else {
+            CheckChunkDistance(RootChunk);
+        }
     }
     
     void Start(){

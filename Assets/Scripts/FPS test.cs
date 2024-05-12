@@ -91,7 +91,6 @@ public class FPStest : MonoBehaviour{
         fpsHist = new float[Mathf.RoundToInt(avgTime/updateInterval)];
         histIndex = 0;
         maxHistIndex = Mathf.RoundToInt(avgTime / updateInterval) - 1;
-        print(maxHistIndex);
     }
     
 

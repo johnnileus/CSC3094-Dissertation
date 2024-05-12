@@ -15,7 +15,7 @@ public class MeshGenCommon
         { 7, 2f }
     };
     
-    public static float GetMeshHeight(float x, float z){
+    public static float GetMeshHeight(float x, float z) {
         return 10*(Mathf.PerlinNoise(x/30, z/30)*5 + Mathf.PerlinNoise(x/300, z/300)*100 + Mathf.PerlinNoise(x/5, z/5));
     }
     

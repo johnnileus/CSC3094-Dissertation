@@ -17,6 +17,8 @@ public class MeshGenAlg1 : MonoBehaviour{
 
     private GameObject player;
 
+    [SerializeField] private bool testGenMesh = true;
+
     private Dictionary<int, float> detailDistances = MeshGenCommon.detailDistances;
     
     private void CheckChunkDistance(MeshChunk chunk){
@@ -41,8 +43,29 @@ public class MeshGenAlg1 : MonoBehaviour{
         }
     }
     
+    public void TestGenMesh() {
+        float startTime = Time.realtimeSinceStartup;
+
+
+        // private Mesh GenMesh(int detailLevel, Vector2 globalPos, MeshChunk chunk) {
+        for (int i = 0; i < 10000; i++) {
+            SplitMesh(RootChunk);
+            MergeMesh(RootChunk);
+        }
+        
+        float timeTaken = Time.realtimeSinceStartup - startTime;
+        print($"{timeTaken/10000 * 1000}ms"); 
+
+    }
+    
     private void Update(){
         CheckChunkDistance(RootChunk);
+        if (testGenMesh) {
+            testGenMesh = false;
+            TestGenMesh();
+        } else {
+            CheckChunkDistance(RootChunk);
+        }
     }
     
     private int ListToInt(List<int> lst) {
@@ -142,6 +165,8 @@ public class MeshGenAlg1 : MonoBehaviour{
         
         meshObj.transform.parent = transform;
         RootChunk.MeshGO = meshObj;
+        
+        
         
         // SplitMesh(RootChunk);
         // SplitMesh(RootChunk.Children[0]);
