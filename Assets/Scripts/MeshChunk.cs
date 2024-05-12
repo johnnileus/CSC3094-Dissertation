@@ -33,6 +33,4 @@ public class MeshChunk{
         Debug.Log($"{prefix}, {str}");
         
     }
-    
-    
 }

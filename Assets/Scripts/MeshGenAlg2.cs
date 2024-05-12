@@ -15,17 +15,7 @@ public class MeshGenAlg2 : MonoBehaviour{
 
     private GameObject player;
     public GameObject testObj;
-
-    private Dictionary<int, float> detailDistances = new Dictionary<int, float>() {
-        { 0, 256f },
-        { 1, 128f },
-        { 2, 64f },
-        { 3, 32f },
-        { 4, 16f },
-        { 5, 8f },
-        { 6, 4f },
-        { 7, 2f }
-    };
+    private Dictionary<int, float> detailDistances = MeshGenCommon.detailDistances;
     
     private void CheckChunkDistance(MeshChunk chunk){
         
@@ -129,9 +119,6 @@ public class MeshGenAlg2 : MonoBehaviour{
         }
     }
 
-    private float GetMeshHeight(float x, float z){
-        return 10*(Mathf.PerlinNoise(x/30, z/30)*5 + Mathf.PerlinNoise(x/300, z/300)*100 + Mathf.PerlinNoise(x/5, z/5));
-    }
 
     private Mesh GenMesh(int detailLevel, Vector2 globalPos){
         Mesh m = new Mesh();
@@ -145,7 +132,7 @@ public class MeshGenAlg2 : MonoBehaviour{
         
                 float xPos = x * CellSize / scale;
                 float yPos = y * CellSize / scale;
-                float height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
+                float height = MeshGenCommon.GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
                 
                 
                 

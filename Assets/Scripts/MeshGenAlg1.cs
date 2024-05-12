@@ -17,16 +17,7 @@ public class MeshGenAlg1 : MonoBehaviour{
 
     private GameObject player;
 
-    private Dictionary<int, float> detailDistances = new Dictionary<int, float>() {
-        { 0, 256f },
-        { 1, 128f },
-        { 2, 64f },
-        { 3, 32f },
-        { 4, 16f },
-        { 5, 8f },
-        { 6, 4f },
-        { 7, 2f }
-    };
+    private Dictionary<int, float> detailDistances = MeshGenCommon.detailDistances;
     
     private void CheckChunkDistance(MeshChunk chunk){
         
@@ -157,14 +148,6 @@ public class MeshGenAlg1 : MonoBehaviour{
         // SplitMesh(RootChunk.Children[0].Children[2]);
         // SplitMesh(RootChunk.Children[0].Children[3]);
         
-        // RootChunk.PrintPath();
-
-        //FindQuadTreeNeighbourPath(RootChunk.Children[0].Children[0].Children[0], 'S');
-        //RootChunk.Children[0].Children[0].Children[0].PrintPath("");
-        //GetChunkFromPath(new List<int> { 0, 0});
-
-
-        // MergeMesh(RootChunk.Children[0]);
 
     }
 
@@ -252,18 +235,18 @@ public class MeshGenAlg1 : MonoBehaviour{
                     new Vector2(newPos.x, newPos.z), childChunk);
             }
             
-            //recalculate neighbour meshes
-            for (int i = 0; i < 4; i++) {
-                List<int> path = FindQuadTreeNeighbourPath(chunk, i); //combine with genmesh for efficiency
-                if (path != null) {
-                    MeshChunk neighbour = GetChunkFromPath(path);// possible error with being larger than node then looping over non-bordering children?
-                    List<MeshChunk> children = FindChunksOnBorder(neighbour, i);
-                    foreach (var child in children) {
-                        child.MeshGO.GetComponent<MeshFilter>().mesh = GenMesh(child.DetailLevel, new Vector2(child.Pos.x, child.Pos.z), child);
-                    }
-                }
-                
-            }
+            // recalculate neighbour meshes
+             for (int i = 0; i < 4; i++) {
+                 List<int> path = FindQuadTreeNeighbourPath(chunk, i); //combine with genmesh for efficiency
+                 if (path != null) {
+                     MeshChunk neighbour = GetChunkFromPath(path);// possible error with being larger than node then looping over non-bordering children?
+                     List<MeshChunk> children = FindChunksOnBorder(neighbour, i);
+                     foreach (var child in children) {
+                         child.MeshGO.GetComponent<MeshFilter>().mesh = GenMesh(child.DetailLevel, new Vector2(child.Pos.x, child.Pos.z), child);
+                     }
+                 }
+                 
+             }
             
 
 
@@ -284,7 +267,7 @@ public class MeshGenAlg1 : MonoBehaviour{
             chunk.MeshGO.GetComponent<MeshRenderer>().enabled = true;
         }
         
-        //recalculate neighbour meshes
+        // //recalculate neighbour meshes
         for (int i = 0; i < 4; i++) {
             List<int> path = FindQuadTreeNeighbourPath(chunk, i);
             if (path != null) {
@@ -298,9 +281,7 @@ public class MeshGenAlg1 : MonoBehaviour{
         }
     }
     
-    private float GetMeshHeight(float x, float z){
-        return 10*(Mathf.PerlinNoise(x/30, z/30)*5 + Mathf.PerlinNoise(x/300, z/300)*100 + Mathf.PerlinNoise(x/5, z/5));
-    }
+
 
     private MeshChunk GetChunkFromPath(List<int> path) {
         if (path.Count == 0) {
@@ -381,8 +362,8 @@ public class MeshGenAlg1 : MonoBehaviour{
                     int node = Mathf.FloorToInt(chunkProgress);
                     float progress = chunkProgress - node;
                     
-                    float h1 = GetMeshHeight(neighbours[0].Pos[0] + node * neighbours[0].CellSize, chunk.Pos[2] + yPos);
-                    float h2 = GetMeshHeight(neighbours[0].Pos[0] + (node+1) * neighbours[0].CellSize, chunk.Pos[2] + yPos);
+                    float h1 = MeshGenCommon.GetMeshHeight(neighbours[0].Pos[0] + node * neighbours[0].CellSize, chunk.Pos[2] + yPos);
+                    float h2 = MeshGenCommon.GetMeshHeight(neighbours[0].Pos[0] + (node+1) * neighbours[0].CellSize, chunk.Pos[2] + yPos);
                     height = Mathf.Lerp(h1, h2, progress);
                 }else if (x == MeshCellCount && attachEast) {
                         
@@ -392,8 +373,8 @@ public class MeshGenAlg1 : MonoBehaviour{
                     int node = Mathf.FloorToInt(chunkProgress);
                     float progress = chunkProgress - node;
                     
-                    float h1 = GetMeshHeight(chunk.Pos[0] + xPos, neighbours[1].Pos[2] + node * neighbours[1].CellSize);
-                    float h2 = GetMeshHeight(chunk.Pos[0] + xPos, neighbours[1].Pos[2] + (node+1) * neighbours[1].CellSize);
+                    float h1 = MeshGenCommon.GetMeshHeight(chunk.Pos[0] + xPos, neighbours[1].Pos[2] + node * neighbours[1].CellSize);
+                    float h2 = MeshGenCommon.GetMeshHeight(chunk.Pos[0] + xPos, neighbours[1].Pos[2] + (node+1) * neighbours[1].CellSize);
                     height = Mathf.Lerp(h1, h2, progress);
                 }
                 else if (y == 0 && attachSouth) {
@@ -403,8 +384,8 @@ public class MeshGenAlg1 : MonoBehaviour{
                     int node = Mathf.FloorToInt(chunkProgress);
                     float progress = chunkProgress - node;
                     
-                    float h1 = GetMeshHeight(neighbours[2].Pos[0] + node * neighbours[2].CellSize, chunk.Pos[2]);
-                    float h2 = GetMeshHeight(neighbours[2].Pos[0] + (node+1) * neighbours[2].CellSize, chunk.Pos[2]);
+                    float h1 = MeshGenCommon.GetMeshHeight(neighbours[2].Pos[0] + node * neighbours[2].CellSize, chunk.Pos[2]);
+                    float h2 = MeshGenCommon.GetMeshHeight(neighbours[2].Pos[0] + (node+1) * neighbours[2].CellSize, chunk.Pos[2]);
                     height = Mathf.Lerp(h1, h2, progress);
                 } 
                 else if (x == 0 && attachWest) {
@@ -415,12 +396,12 @@ public class MeshGenAlg1 : MonoBehaviour{
                     int node = Mathf.FloorToInt(chunkProgress);
                     float progress = chunkProgress - node;
                     
-                    float h1 = GetMeshHeight(chunk.Pos[0], neighbours[3].Pos[2] + node * neighbours[3].CellSize);
-                    float h2 = GetMeshHeight(chunk.Pos[0], neighbours[3].Pos[2] + (node+1) * neighbours[3].CellSize);
+                    float h1 = MeshGenCommon.GetMeshHeight(chunk.Pos[0], neighbours[3].Pos[2] + node * neighbours[3].CellSize);
+                    float h2 = MeshGenCommon.GetMeshHeight(chunk.Pos[0], neighbours[3].Pos[2] + (node+1) * neighbours[3].CellSize);
                     height = Mathf.Lerp(h1, h2, progress);
                 }
                 else {
-                    height = GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
+                    height = MeshGenCommon.GetMeshHeight(globalPos.x + xPos, globalPos.y + yPos);
                 }
                 
                 
